@@ -100,10 +100,10 @@ $(document).ready(function() {
 		{"data": "tel1"},
 		{"data": "tel2"},
 		{"data": "mobile"},
-		{"data": "stat"},
 		{"data": "zip"},
 		{"data": "addr"},
 		{"data": "type"},
+		{"data": "stat"},
 		{"data": "fm1"},
 		{"data": "fm2"},
 		{"data": "fm3"},
@@ -116,20 +116,22 @@ $(document).ready(function() {
 	
 		scrollY: 150,
 		scrollX: true,
-		paging:   false,
+		paging:   true,
 		ordering: false,
-		info:     false,
+		info:     true,
 		jQueryUI: false
 	} );
 		
 
 	$('#txfKeyword').bind("enterKey",function(e){
-		fxnUpdateView(table,"keyword",$('#selField').find(":selected").text(), $(this).val(), $("#txfLimit").val());
+		$('#spinner').html('<img src="images/loading.gif"> Loading...');
+		fxnUpdateView(table,"keyword",$('#selField').find(":selected").text(), $('#txfKeyword').val(), $("#txfLimit").val());
+		$('#spinner').html('');
 	} );
 	$('#txfKeyword').keyup(function(e){ if(e.keyCode == 13){$(this).trigger("enterKey");}	});
 
 	$('#txfLimit').bind("enterKey",function(e){
-		fxnUpdateView(table,"keyword",$('#selField').find(":selected").text(), $(this).val(), $("#txfLimit").val());
+		fxnUpdateView(table,"keyword",$('#selField').find(":selected").text(), $('#txfKeyword').val(), $("#txfLimit").val());
 	} );
 	$('#txfLimit').keyup(function(e){ if(e.keyCode == 13){$(this).trigger("enterKey");}	});
 
@@ -281,6 +283,7 @@ $(document).ready(function() {
 		  }
 	  }
     });
+
 	
 } );
 
@@ -373,7 +376,7 @@ function setFieldNormal(){
 
 
 function fxnUpdateView(table, action, field, value, limit){
-
+		//alert(table + " " + action + " " + field + " " + value + " " +limit);
 		if (value.length == 0)
 			return;
 
@@ -393,11 +396,13 @@ function fxnUpdateView(table, action, field, value, limit){
 				table.clear().draw();
 				var obj = JSON.parse (resp);
 				var dataArr = obj['data']; //extract the array
+
 				var contact;
 					//CAN'T USE   var x in dataArr
 					//for(var i=0; i< arr.length; i++){
 					dataArr.forEach(function(arr){
-					contact = new Contact(arr.id, arr.name, arr.tel1, arr.tel2, arr.mobile, arr.stat, 
+					contact = new Contact(arr.id, arr.name, arr.tel1, arr.tel2, arr.mobile, 
+									arr.stat, 
 									arr.zip, arr.addr, arr.type, 
 									arr.fm1, arr.fm2, arr.fm3, arr.fm4, arr.fm5, arr.fm6, 
 									arr.note, arr.plp);
@@ -431,8 +436,7 @@ function fxnUpdateView(table, action, field, value, limit){
 				return false;
 			}
 		});	
-				
-			
+
 }
 function fxnSearchField(action, field, value){
 		if (value.length == 0)
@@ -467,8 +471,8 @@ function readContactForm(){
 		"tel2": $("#txfTel2").val(),
 		"mobile" : $("#txfMobile").val(),
 		"stat" : $("#txfStat").val(),
-		"addr" : $("#txfAddr").val(),
 		"zip" : $("#txfZIP").val(),
+		"addr" : $("#txfAddr").val(),
 		"type" : $("#txfType").val(),
 		"fm1" : $("#txfFm1").val(),
 		"fm2" : $("#txfFm2").val(),
@@ -530,6 +534,19 @@ th, td {
 	text-align: left;
 }
 
+ .spinner {
+	  position: fixed;
+	  top: 50%;
+	  left: 50%;
+	  margin-left: -50px; /* half width of the spinner gif */
+	  margin-top: -50px; /* half height of the spinner gif */
+	  text-align:center;
+	  z-index:1234;
+	  overflow: auto;
+	  width: 100px; /* width of the spinner gif */
+	  height: 102px; /*hight of the spinner gif +2px to fix IE8 issue */
+}
+  
 div.dataTables_wrapper {
 	margin: 0 auto;
 }
@@ -606,9 +623,9 @@ body {
           <th>電話1</th>
           <th>電話2</th>
           <th>行動</th>
-          <th>狀態</th>
           <th>區碼</th>
           <th>地址</th>
+          <th>狀態</th>
           <th>群組</th>
           <th>成員1</th>
           <th>成員2</th>
@@ -680,6 +697,17 @@ body {
       <td><input class="fieldClass" name="txfID" type="text"  id="txfID"></td>
     </tr>
     <tr>
+      <td >群組</td>
+      <td><input class="fieldClass" type="text" name="txfType" id="txfType">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <select  class="fieldClass" name="selType" id="selType">
+		<?php
+        while ( $row = $rsType->fetch_array(MYSQLI_ASSOC) ) {
+            echo "<option value="  . $row['type']. ">"  . $row['type']. "</option>";
+        }
+        ?>
+      </select></td>
+    </tr>	
+    <tr>
       <td >姓名</td>
       <td><input name="txfName" type="text" required="required" class="fieldClass" id="txfName"></td>
     </tr>
@@ -697,17 +725,7 @@ body {
       <td>
       <input name="txfAddr" type="text" class="fieldClass" id="txfAddr" size="80"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;區碼<input class="fieldClass" name="txfZIP" type="text" id="txfZIP" size="6" maxlength="4"></td>
     </tr>
-    <tr>
-      <td >群組</td>
-      <td><input class="fieldClass" type="text" name="txfType" id="txfType">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <select  class="fieldClass" name="selType" id="selType">
-		<?php
-        while ( $row = $rsType->fetch_array(MYSQLI_ASSOC) ) {
-            echo "<option value="  . $row['type']. ">"  . $row['type']. "</option>";
-        }
-        ?>
-      </select></td>
-    </tr>
+
     <tr>
       <td >狀態</td>
       <td><input class="fieldClass" type="text" name="txfStat" id="txfStat">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -764,6 +782,8 @@ body {
 
 </div>
 
+<div id="spinner">
+</div>
 
 </body>
 </html>

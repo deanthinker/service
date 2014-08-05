@@ -24,8 +24,8 @@ if(isset($_POST["a"]) && strlen($_POST["a"])>0
 
 if ($action == 'keyword'){
 	//MySQLi query
-	if ($field == "htel1" || $field == "htel2"){
-		$sql = "SELECT * FROM Service.main where htel1 LIKE '"  . $value . "%' OR htel2 LIKE '"  . $value . "%' order by id desc limit " . $limit;
+	if ($field == "htel1" || $field == "htel2" || $field == "mobile"){
+		$sql = "SELECT * FROM Service.main where htel1 LIKE '"  . $value . "%' OR htel2 LIKE '"  . $value . "%' OR mobile LIKE '"  . $value . "%' order by id desc limit " . $limit;
 	}
 	else{
 		$sql = "SELECT * FROM Service.main where " . $field . " LIKE '"  . $value . "%'  order by id desc limit " . $limit;
@@ -88,6 +88,9 @@ if($rs->num_rows == 0) {
 			//$dataArray[] = $data;//insert each data row into an assembled array
 	
         }
+		$arr["draw"] = 1;
+		$arr["recordsTotal"] = $rs->num_rows;
+		$arr["recordsFiltered"] = $rs->num_rows;
 		$arr["data"] = $data;
 		echo json_encode($arr);		
 
